@@ -122,15 +122,22 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   sendButton: {
-    backgroundColor: "#4da6ff",
-    padding: 12,
+    backgroundColor: "#007bff",
+    paddingVertical: 15,
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    shadowColor: "#007bff",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 4,
   },
   sendButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
+    color: "#fff",
   },
 });
 
