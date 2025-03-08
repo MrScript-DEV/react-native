@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import PageLayout from "../../components/PageLayout";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -28,48 +29,50 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Bienvenue</Text>
-      <Text style={styles.subtitle}>Connectez-vous pour continuer</Text>
+    <PageLayout>
+      <View style={styles.container}>
+        <Text style={styles.title}>Bienvenue</Text>
+        <Text style={styles.subtitle}>Connectez-vous pour continuer</Text>
 
-      <View style={styles.formContainer}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Votre email"
-          placeholderTextColor="#aaa"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
+        <View style={styles.formContainer}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Votre email"
+            placeholderTextColor="#aaa"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
 
-        <Text style={styles.label}>Mot de passe</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Votre mot de passe"
-          placeholderTextColor="#aaa"
-          secureTextEntry={true}
-          value={password}
-          onChangeText={setPassword}
-        />
+          <Text style={styles.label}>Mot de passe</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Votre mot de passe"
+            placeholderTextColor="#aaa"
+            secureTextEntry={true}
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Se connecter</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.loginButtonText}>Se connecter</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.signupButton}
-          onPress={() => {
-            navigation.navigate("Register");
-          }}
-        >
-          <Text style={styles.signupText}>
-            Nouveau sur Script Support ?{" "}
-            <Text style={styles.boldSignupText}>S'inscrire</Text>
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.signupButton}
+            onPress={() => {
+              navigation.navigate("Register");
+            }}
+          >
+            <Text style={styles.signupText}>
+              Nouveau sur Script Support ?{" "}
+              <Text style={styles.boldSignupText}>S'inscrire</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </PageLayout>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,9 +11,9 @@ import { Picker } from "@react-native-picker/picker";
 import PageLayout from "../../components/PageLayout";
 
 const CreateTicketScreen = ({ navigation }) => {
-  let subject = "";
-  let message = "";
-  let priority = "Low";
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [priority, setPriority] = useState("Low");
 
   const handleSubmit = () => {
     if (!subject || !message) {
@@ -28,40 +28,56 @@ const CreateTicketScreen = ({ navigation }) => {
   return (
     <PageLayout>
       <View style={styles.container}>
-        <Text>Soyez précis lorsque vous décrivez votre problème</Text>
+        <Text style={styles.instructionText}>
+          Soyez précis lorsque vous décrivez votre problème
+        </Text>
 
-        <Text style={styles.label}>Utilisateur</Text>
-        <TextInput style={styles.input} value={"John Doe"} editable={false} />
+        <View style={styles.formContainer}>
+          <Text style={styles.label}>Utilisateur</Text>
+          <TextInput
+            style={styles.input}
+            value={"John Doe"}
+            editable={false}
+            placeholderTextColor="#aaa"
+          />
 
-        <Text style={styles.label}>Sujet du ticket</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Entrez le sujet du ticket"
-          onChangeText={(text) => (subject = text)}
-        />
+          <Text style={styles.label}>Sujet du ticket</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Entrez le sujet du ticket"
+            placeholderTextColor="#aaa"
+            onChangeText={setSubject}
+            value={subject}
+          />
 
-        <Text style={styles.label}>Message</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Décrivez votre problème"
-          onChangeText={(text) => (message = text)}
-          multiline
-        />
+          <Text style={styles.label}>Message</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Décrivez votre problème"
+            placeholderTextColor="#aaa"
+            onChangeText={setMessage}
+            value={message}
+            multiline
+            textAlignVertical="top"
+          />
 
-        <Text style={styles.label}>Priorité</Text>
-        <Picker
-          selectedValue={priority}
-          style={styles.picker}
-          onValueChange={(itemValue) => (priority = itemValue)}
-        >
-          <Picker.Item label="Faible" value="Low" />
-          <Picker.Item label="Moyenne" value="Medium" />
-          <Picker.Item label="Élevée" value="High" />
-        </Picker>
+          <Text style={styles.label}>Priorité</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={priority}
+              style={styles.picker}
+              onValueChange={(itemValue) => setPriority(itemValue)}
+            >
+              <Picker.Item label="Faible" value="Low" />
+              <Picker.Item label="Moyenne" value="Medium" />
+              <Picker.Item label="Élevée" value="High" />
+            </Picker>
+          </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Soumettre le ticket</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+            <Text style={styles.submitButtonText}>Soumettre le ticket</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </PageLayout>
   );
@@ -70,43 +86,68 @@ const CreateTicketScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f8f8f8",
+    paddingHorizontal: 30,
+  },
+  instructionText: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "left",
+    marginBottom: 30,
+  },
+  formContainer: {
+    width: "100%",
   },
   label: {
     fontSize: 16,
-    fontWeight: "600",
-    marginVertical: 10,
+    fontWeight: "bold",
+    color: "#555",
+    marginBottom: 10,
   },
   input: {
-    height: 40,
-    borderColor: "#ccc",
+    height: 50,
+    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 8,
-    paddingLeft: 10,
-    marginBottom: 15,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: "#333",
+    backgroundColor: "white",
+    marginBottom: 20,
   },
   textArea: {
-    height: 100,
-    textAlignVertical: "top",
+    minHeight: 100,
+    paddingVertical: 15,
+  },
+  pickerContainer: {
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 20,
+    backgroundColor: "white",
   },
   picker: {
     height: 50,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    marginBottom: 15,
+    fontSize: 16,
+    color: "#333",
   },
   submitButton: {
     backgroundColor: "#007bff",
-    padding: 15,
+    paddingVertical: 15,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 10,
+    shadowColor: "#007bff",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 4,
   },
   submitButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });
 

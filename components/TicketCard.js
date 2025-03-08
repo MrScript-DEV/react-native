@@ -1,8 +1,15 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import StarRating from "./StarRating";
 
-const TicketCard = ({ ticket, onPress }) => {
+const TicketCard = ({
+  ticket,
+  onPress,
+  showRating,
+  rating,
+  onRatingChange,
+}) => {
   const getPriorityBadgeStyles = (priority) => {
     switch (priority) {
       case "High":
@@ -62,6 +69,17 @@ const TicketCard = ({ ticket, onPress }) => {
           </View>
         )}
       </View>
+
+      {showRating && (
+        <View style={styles.ratingSection}>
+          <Text style={styles.ratingLabel}>Evaluation :</Text>
+          <StarRating
+            maxStars={5}
+            rating={rating}
+            onRatingChange={onRatingChange}
+          />
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -76,6 +94,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
+    flexDirection: "column",
   },
   ticketSubject: {
     fontSize: 18,
@@ -115,6 +134,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 10,
+  },
+  ratingSection: {
+    flexDirection: "column",
+    alignItems: "center",
+    marginTop: 15,
+  },
+  ratingLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#555",
+    marginBottom: 5,
+    marginRight: 0,
   },
 });
 

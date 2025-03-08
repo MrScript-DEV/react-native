@@ -1,4 +1,3 @@
-// ShowTicketScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -10,39 +9,8 @@ import {
 import PageLayout from "../../components/PageLayout";
 import MessageList from "../../components/MessageList";
 
-const tickets = [
-  {
-    id: "1",
-    subject: "Problème de connexion",
-    priority: "High",
-    status: "Ouvert",
-    unreadMessages: 3,
-  },
-  {
-    id: "2",
-    subject: "Erreur lors du paiement",
-    priority: "Medium",
-    status: "Ouvert",
-    unreadMessages: 1,
-  },
-  {
-    id: "3",
-    subject: "Bogue dans l'application",
-    priority: "Low",
-    status: "En attente",
-    unreadMessages: 0,
-  },
-  {
-    id: "4",
-    subject: "Problème de mise à jour",
-    priority: "High",
-    status: "Ouvert",
-    unreadMessages: 2,
-  },
-];
-
 const ShowTicketScreen = ({ route }) => {
-  const { ticketId } = route.params;
+  const { ticketId, tickets, showBtnMessage = true } = route.params;
 
   const [ticket, setTicket] = useState(null);
   const [messages, setMessages] = useState([
@@ -62,7 +30,7 @@ const ShowTicketScreen = ({ route }) => {
   useEffect(() => {
     const foundTicket = tickets.find((ticket) => ticket.id === ticketId);
     setTicket(foundTicket);
-  }, [ticketId]);
+  }, [ticketId, tickets]);
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
@@ -95,21 +63,23 @@ const ShowTicketScreen = ({ route }) => {
 
           <MessageList messages={messages} />
 
-          <View style={styles.sendMessageSection}>
-            <TextInput
-              style={styles.messageInput}
-              value={newMessage}
-              onChangeText={setNewMessage}
-              placeholder="Écrivez un message..."
-              multiline
-            />
-            <TouchableOpacity
-              style={styles.sendButton}
-              onPress={handleSendMessage}
-            >
-              <Text style={styles.sendButtonText}>Envoyer</Text>
-            </TouchableOpacity>
-          </View>
+          {showBtnMessage && (
+            <View style={styles.sendMessageSection}>
+              <TextInput
+                style={styles.messageInput}
+                value={newMessage}
+                onChangeText={setNewMessage}
+                placeholder="Écrivez un message..."
+                multiline
+              />
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={handleSendMessage}
+              >
+                <Text style={styles.sendButtonText}>Envoyer</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </>
       )}
     </PageLayout>
