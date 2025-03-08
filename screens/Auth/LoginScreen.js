@@ -1,43 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  Button,
   TouchableOpacity,
-  Text as RNText,
   StyleSheet,
+  Alert,
 } from "react-native";
 
 const LoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Alert.alert("Erreur", "Adresse email invalide.");
+      return;
+    }
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Dashboard" }],
+    });
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>Bienvenue sur Script Support</Text>
+      <Text style={styles.title}>Bienvenue</Text>
+      <Text style={styles.subtitle}>Connectez-vous pour continuer</Text>
 
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#888"
+          placeholder="Votre email"
+          placeholderTextColor="#aaa"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
 
+        <Text style={styles.label}>Mot de passe</Text>
         <TextInput
           style={styles.input}
-          placeholder="Mot de passe"
-          placeholderTextColor="#888"
+          placeholder="Votre mot de passe"
+          placeholderTextColor="#aaa"
           secureTextEntry={true}
+          value={password}
+          onChangeText={setPassword}
         />
 
-        <Button
-          title="Se connecter"
-          onPress={() => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Dashboard" }],
-            });
-          }}
-        />
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Se connecter</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.signupButton}
@@ -45,7 +63,10 @@ const LoginScreen = ({ navigation }) => {
             navigation.navigate("Register");
           }}
         >
-          <RNText style={styles.signupText}>S'inscrire</RNText>
+          <Text style={styles.signupText}>
+            Nouveau sur Script Support ?{" "}
+            <Text style={styles.boldSignupText}>S'inscrire</Text>
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -55,52 +76,72 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#f8f8f8",
-    padding: 20,
-  },
-  innerContainer: {
-    width: "100%",
-    maxWidth: 400,
-    padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
+    paddingHorizontal: 30,
+    justifyContent: "center",
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
     color: "#333",
-    textAlign: "center",
-    marginBottom: 20,
+    textAlign: "left",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#777",
+    textAlign: "left",
+    marginBottom: 30,
+  },
+  formContainer: {
+    width: "100%",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#555",
+    marginBottom: 10,
   },
   input: {
     height: 50,
     borderColor: "#ddd",
     borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
+    borderRadius: 8,
     paddingHorizontal: 15,
     fontSize: 16,
     color: "#333",
+    backgroundColor: "white",
+    marginBottom: 20,
+  },
+  loginButton: {
+    backgroundColor: "#007bff",
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    shadowColor: "#007bff",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  loginButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
   },
   signupButton: {
-    marginTop: 15,
-    padding: 10,
+    paddingVertical: 10,
     alignItems: "center",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#333",
   },
   signupText: {
     fontSize: 16,
-    color: "#333",
+    color: "#555",
+  },
+  boldSignupText: {
     fontWeight: "bold",
+    color: "#007bff",
   },
 });
 
