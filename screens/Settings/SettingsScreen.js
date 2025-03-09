@@ -21,28 +21,23 @@ const SettingsScreen = ({ navigation }) => {
         <View style={styles.settingsGroup}>
           <Text style={styles.groupTitle}>Compte</Text>
           <CustomButton
+            iconSource={require("../../assets/icons/edit_profile_icon.png")}
             buttonText="Modifier le profil"
-            onPress={() => alert("Modifier profil (Factice)")}
-            style={styles.settingButton}
-          />
-          <CustomButton
-            buttonText="Notifications"
-            onPress={() => alert("Notifications (Factice)")}
-            style={styles.settingButton}
+            onPress={() => navigation.navigate("EditProfile")}
           />
         </View>
 
         <View style={styles.settingsGroup}>
           <Text style={styles.groupTitle}>Application</Text>
           <CustomButton
+            iconSource={require("../../assets/icons/help_icon.png")}
             buttonText="Aide"
-            onPress={() => alert("Aide (Factice)")}
-            style={styles.settingButton}
+            onPress={() => navigation.navigate("Help")}
           />
           <CustomButton
+            iconSource={require("../../assets/icons/about_icon.png")}
             buttonText="À propos"
-            onPress={() => alert("À propos (Factice)")}
-            style={styles.settingButton}
+            onPress={() => navigation.navigate("About")}
           />
         </View>
 
@@ -79,9 +74,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: "#555",
     textAlign: "left",
-  },
-  settingButton: {
-    marginBottom: 10,
   },
   logoutButton: {
     backgroundColor: "#e74c3c",

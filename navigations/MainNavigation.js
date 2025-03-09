@@ -10,6 +10,9 @@ import IndexHistoryTicketScreen from "../screens/Tickets/IndexHistoryTicketScree
 import IndexTicketScreen from "../screens/Tickets/IndexTicketScreen";
 import SettingsScreen from "../screens/Settings/SettingsScreen";
 import ShowTicketScreen from "../screens/Tickets/ShowTicketScreen";
+import AboutScreen from "../screens/Settings/AboutScreen";
+import HelpScreen from "../screens/Settings/HelpScreen";
+import EditProfileScreen from "../screens/Settings/EditProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +68,24 @@ const MainNavigation = () => {
           name="Settings"
           component={SettingsScreen}
           options={{ title: "Paramètre" }}
+        />
+
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfileScreen}
+          options={{ title: "Modification du profil" }}
+        />
+
+        <Stack.Screen
+          name="About"
+          component={AboutScreen}
+          options={{ title: "A propos" }}
+        />
+
+        <Stack.Screen
+          name="Help"
+          component={HelpScreen}
+          options={{ title: "Centre d'aide" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
