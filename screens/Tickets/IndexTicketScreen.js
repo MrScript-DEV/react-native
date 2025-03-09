@@ -1,6 +1,6 @@
 // IndexTicketScreen.js
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PageLayout from "../../components/PageLayout";
 import TicketCard from "../../components/TicketCard";

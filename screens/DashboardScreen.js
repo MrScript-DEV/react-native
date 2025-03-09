@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, StyleSheet } from "react-native";
 import PageLayout from "../components/PageLayout";
 import StatsTickets from "../components/StatsTickets";
 import CustomButton from "../components/CustomButton";

@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PageLayout from "../../components/PageLayout";
 import TicketCard from "../../components/TicketCard";
-import CustomButton from "../../components/CustomButton";
 
 const IndexEvaluateTicketScreen = ({ navigation }) => {
   const evaluateTickets = [

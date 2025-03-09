@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native"; // Import ScrollView
+import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PageLayout from "../../components/PageLayout";
 import TicketCard from "../../components/TicketCard";
@@ -72,15 +72,9 @@ const IndexHistoryTicketScreen = ({ navigation }) => {
           </View>
         </View>
 
-        <ScrollView style={styles.ticketsListContainer}>
-          {filterTickets().map((item) => (
-            <TicketCard
-              key={item.id}
-              ticket={item}
-              onPress={handleTicketPress}
-            />
-          ))}
-        </ScrollView>
+        {filterTickets().map((item) => (
+          <TicketCard key={item.id} ticket={item} onPress={handleTicketPress} />
+        ))}
       </View>
     </PageLayout>
   );
@@ -118,10 +112,6 @@ const styles = StyleSheet.create({
     height: 50,
     fontSize: 16,
     color: "#333",
-  },
-  ticketsListContainer: {
-    flex: 1,
-    width: "100%",
   },
 });
 
