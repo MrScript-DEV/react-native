@@ -2,10 +2,10 @@ import { View, Text, StyleSheet } from "react-native";
 
 const StatsTickets = () => {
   const ticketStats = {
-    open: 5,
-    inProgress: 2,
-    toEvaluate: 3,
-    closed: 10,
+    open: 4,
+    inProgress: 3,
+    toEvaluate: 2,
+    closed: 3,
   };
 
   return (

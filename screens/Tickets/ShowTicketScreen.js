@@ -16,13 +16,13 @@ const ShowTicketScreen = ({ route }) => {
   const [messages, setMessages] = useState([
     {
       id: "1",
-      user: "Support",
-      message: "Bonjour, comment puis-je vous aider ?",
+      user: "Utilisateur",
+      message: "J'ai un problème et j'ai besoin d'aide ...",
     },
     {
       id: "2",
-      user: "Utilisateur",
-      message: "J'ai un problème de connexion.",
+      user: "Support",
+      message: "Bonjour, comment puis-je vous aider ?",
     },
   ]);
   const [newMessage, setNewMessage] = useState("");
