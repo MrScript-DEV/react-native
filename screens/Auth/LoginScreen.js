@@ -8,12 +8,13 @@ import {
   Alert,
 } from "react-native";
 import PageLayout from "../../components/PageLayout";
+import { login } from "../../services/auth";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs.");
       return;
@@ -22,10 +23,16 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert("Erreur", "Adresse email invalide.");
       return;
     }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Dashboard" }],
-    });
+
+    try {
+      await login(email, password);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Dashboard" }],
+      });
+    } catch (err) {
+      Alert.alert("Échec de connexion", err.message);
+    }
   };
 
   return (

@@ -8,25 +8,31 @@ import {
   Alert,
 } from "react-native";
 import PageLayout from "../../components/PageLayout";
+import { register } from "../../services/auth";
 
 const RegisterScreen = ({ navigation }) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = () => {
-    if (!email || !password || !confirmPassword) {
+  const handleRegister = async () => {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs.");
       return;
     }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       Alert.alert("Erreur", "Adresse email invalide.");
       return;
     }
+
     if (password !== confirmPassword) {
       Alert.alert("Erreur", "Les mots de passe ne correspondent pas.");
       return;
     }
+
     if (password.length < 8) {
       Alert.alert(
         "Erreur",
@@ -35,10 +41,22 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
 
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Dashboard" }],
-    });
+    try {
+      await register(firstName, lastName, email, password, confirmPassword);
+
+      Alert.alert("Succès", "Compte créé avec succès !", [
+        {
+          text: "OK",
+          onPress: () =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Login" }],
+            }),
+        },
+      ]);
+    } catch (err) {
+      Alert.alert("Échec de l'inscription", err.message);
+    }
   };
 
   return (
@@ -48,6 +66,24 @@ const RegisterScreen = ({ navigation }) => {
         <Text style={styles.subtitle}>Rejoignez Script Support</Text>
 
         <View style={styles.formContainer}>
+          <Text style={styles.label}>Prénom</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Votre prénom"
+            placeholderTextColor="#aaa"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+
+          <Text style={styles.label}>Nom</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Votre nom"
+            placeholderTextColor="#aaa"
+            value={lastName}
+            onChangeText={setLastName}
+          />
+
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={styles.input}

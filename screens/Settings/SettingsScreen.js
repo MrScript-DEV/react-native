@@ -2,13 +2,19 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import PageLayout from "../../components/PageLayout";
 import CustomButton from "../../components/CustomButton";
+import { logout } from "../../services/auth";
 
 const SettingsScreen = ({ navigation }) => {
-  const handleLogout = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Login" }],
-    });
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+    } catch (err) {
+      Alert.alert("Erreur", err.message || "Déconnexion impossible.");
+    }
   };
 
   return (
