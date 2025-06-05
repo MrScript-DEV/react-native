@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,20 +9,49 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PageLayout from "../../components/PageLayout";
+import { index } from "../../services/priority";
+import { create } from "../../services/ticket";
 
 const CreateTicketScreen = ({ navigation }) => {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [priority, setPriority] = useState("Low");
+  const [priority, setPriority] = useState(null);
+  const [priorities, setPriorities] = useState([]);
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    const loadPriorities = async () => {
+      try {
+        const response = await index();
+        setPriorities(response.data);
+        if (response.data.length > 0) {
+          setPriority(response.data[0].id);
+        }
+      } catch (err) {
+        console.error("Erreur lors du chargement des priorités:", err.message);
+      }
+    };
+
+    loadPriorities();
+  }, []);
+
+  const handleSubmit = async () => {
     if (!subject || !message) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs");
       return;
     }
 
-    Alert.alert("Ticket soumis", "Votre ticket a bien été créé.");
-    navigation.goBack();
+    try {
+      await create(subject, priority, message);
+
+      Alert.alert("Ticket soumis", "Votre ticket a bien été créé.", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    } catch (err) {
+      Alert.alert("Une erreur est survenue..", err.message);
+    }
   };
 
   return (
@@ -33,13 +62,13 @@ const CreateTicketScreen = ({ navigation }) => {
         </Text>
 
         <View style={styles.formContainer}>
-          <Text style={styles.label}>Utilisateur</Text>
+          {/* <Text style={styles.label}>Utilisateur</Text>
           <TextInput
             style={styles.input}
             value={"John Doe"}
             editable={false}
             placeholderTextColor="#aaa"
-          />
+          /> */}
 
           <Text style={styles.label}>Sujet du ticket</Text>
           <TextInput
@@ -68,9 +97,9 @@ const CreateTicketScreen = ({ navigation }) => {
               style={styles.picker}
               onValueChange={(itemValue) => setPriority(itemValue)}
             >
-              <Picker.Item label="Faible" value="Low" />
-              <Picker.Item label="Moyenne" value="Medium" />
-              <Picker.Item label="Élevée" value="High" />
+              {priorities.map((item) => (
+                <Picker.Item key={item.id} label={item.name} value={item.id} />
+              ))}
             </Picker>
           </View>
 
