@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import PageLayout from "../../components/PageLayout";
 import CustomButton from "../../components/CustomButton";
 import { logout } from "../../services/auth";
