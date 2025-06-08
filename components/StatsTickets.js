@@ -1,30 +1,58 @@
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { index as fetchTickets } from "../services/ticket";
 
 const StatsTickets = () => {
-  const ticketStats = {
-    open: 4,
-    inProgress: 3,
-    toEvaluate: 2,
-    closed: 3,
-  };
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await fetchTickets();
+        const tickets = res.data;
+
+        const computedStats = {
+          open: tickets.filter((t) => t.status.id === 1).length,
+          inProgress: tickets.filter((t) => t.status.id === 2).length,
+          toEvaluate: tickets.filter((t) => t.status.id === 3 && t.rating === 0)
+            .length,
+          closed: tickets.filter((t) => t.status.id === 3 && t.rating > 0)
+            .length,
+        };
+
+        setStats(computedStats);
+      } catch (err) {
+        console.error("Erreur lors du chargement des stats :", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStats();
+  }, []);
+
+  if (loading || !stats) {
+    return <ActivityIndicator size="large" color="#007bff" />;
+  }
 
   return (
     <View style={styles.statsContainer}>
       <View style={styles.statsCardContainer}>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{ticketStats.open}</Text>
+          <Text style={styles.statNumber}>{stats.open}</Text>
           <Text style={styles.statLabel}>Ouverts</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{ticketStats.inProgress}</Text>
+          <Text style={styles.statNumber}>{stats.inProgress}</Text>
           <Text style={styles.statLabel}>En cours</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{ticketStats.toEvaluate}</Text>
+          <Text style={styles.statNumber}>{stats.toEvaluate}</Text>
           <Text style={styles.statLabel}>À évaluer</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{ticketStats.closed}</Text>
+          <Text style={styles.statNumber}>{stats.closed}</Text>
           <Text style={styles.statLabel}>Fermés</Text>
         </View>
       </View>
@@ -36,13 +64,6 @@ const styles = StyleSheet.create({
   statsContainer: {
     width: "100%",
     marginBottom: 20,
-  },
-  statsTitle: {
-    fontSize: 22,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 20,
-    textAlign: "center",
   },
   statsCardContainer: {
     flexDirection: "row",

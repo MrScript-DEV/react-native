@@ -10,20 +10,20 @@ const TicketCard = ({
   rating,
   onRatingChange,
 }) => {
-  const getPriorityBadgeStyles = (priority) => {
-    switch (priority) {
-      case "High":
+  const getPriorityBadgeStyles = (level) => {
+    switch (level) {
+      case 3: // High
         return { backgroundColor: "#ff4d4d", textColor: "#fff" };
-      case "Medium":
+      case 2: // Medium
         return { backgroundColor: "#ffcc00", textColor: "#333" };
-      case "Low":
+      case 1: // Low
         return { backgroundColor: "#4da6ff", textColor: "#fff" };
       default:
         return { backgroundColor: "#f0f0f0", textColor: "#333" };
     }
   };
 
-  const badgeStyles = getPriorityBadgeStyles(ticket.priority);
+  const badgeStyles = getPriorityBadgeStyles(ticket.priority?.level);
 
   return (
     <TouchableOpacity
@@ -31,7 +31,7 @@ const TicketCard = ({
       onPress={() => onPress(ticket.id)}
     >
       <View style={styles.ticketHeader}>
-        {ticket.status === "En attente" && (
+        {ticket.status?.name === "En attente" && (
           <Ionicons
             name="time-outline"
             size={20}
@@ -41,6 +41,7 @@ const TicketCard = ({
         )}
         <Text style={styles.ticketSubject}>{ticket.subject}</Text>
       </View>
+
       <View style={styles.ticketFooter}>
         <View
           style={[
@@ -51,28 +52,14 @@ const TicketCard = ({
           <Text
             style={[styles.priorityBadgeText, { color: badgeStyles.textColor }]}
           >
-            {ticket.priority === "High"
-              ? "Élevée"
-              : ticket.priority === "Medium"
-              ? "Moyenne"
-              : "Faible"}
+            {ticket.priority?.name || "Non défini"}
           </Text>
         </View>
-
-        {ticket.unreadMessages > 0 && (
-          <View style={styles.unreadMessagesBadge}>
-            <Text style={styles.unreadMessagesText}>
-              {ticket.unreadMessages === 1
-                ? `${ticket.unreadMessages} message`
-                : `${ticket.unreadMessages} messages`}
-            </Text>
-          </View>
-        )}
       </View>
 
       {showRating && (
         <View style={styles.ratingSection}>
-          <Text style={styles.ratingLabel}>Evaluation :</Text>
+          <Text style={styles.ratingLabel}>Évaluation :</Text>
           <StarRating
             maxStars={5}
             rating={rating}
@@ -114,17 +101,6 @@ const styles = StyleSheet.create({
   priorityBadgeText: {
     fontSize: 14,
     fontWeight: "600",
-  },
-  unreadMessagesBadge: {
-    backgroundColor: "gray",
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 15,
-  },
-  unreadMessagesText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
   },
   statusIcon: {
     marginRight: 5,

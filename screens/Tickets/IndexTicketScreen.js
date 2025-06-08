@@ -1,53 +1,54 @@
-// IndexTicketScreen.js
-import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PageLayout from "../../components/PageLayout";
 import TicketCard from "../../components/TicketCard";
+import { index as fetchTickets } from "../../services/ticket";
+import { index as fetchPriorities } from "../../services/priority";
 
 const IndexTicketScreen = ({ navigation }) => {
-  const tickets = [
-    {
-      id: "1",
-      subject: "Problème de connexion",
-      priority: "High",
-      status: "Ouvert",
-      unreadMessages: 3,
-    },
-    {
-      id: "2",
-      subject: "Erreur lors du paiement",
-      priority: "Medium",
-      status: "Ouvert",
-      unreadMessages: 1,
-    },
-    {
-      id: "3",
-      subject: "Bogue dans l'application",
-      priority: "Low",
-      status: "En attente",
-      unreadMessages: 0,
-    },
-    {
-      id: "4",
-      subject: "Problème de mise à jour",
-      priority: "High",
-      status: "Ouvert",
-      unreadMessages: 2,
-    },
-  ];
+  const [tickets, setTickets] = useState([]);
+  const [priorities, setPriorities] = useState([]);
+  const [selectedPriorityId, setSelectedPriorityId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [selectedPriority, setSelectedPriority] = useState("All");
+  useEffect(() => {
+    const loadPriorities = async () => {
+      try {
+        const res = await fetchPriorities();
+        setPriorities(res.data);
+      } catch (err) {
+        console.error("Erreur lors du chargement des priorités :", err.message);
+      }
+    };
+    loadPriorities();
+  }, []);
 
-  const filterTickets = () => {
-    if (selectedPriority === "All") {
-      return tickets;
-    }
-    return tickets.filter((ticket) => ticket.priority === selectedPriority);
-  };
+  useEffect(() => {
+    const loadTickets = async () => {
+      setLoading(true);
+      try {
+        const [res1, res2] = await Promise.all([
+          fetchTickets(1, selectedPriorityId),
+          fetchTickets(2, selectedPriorityId),
+        ]);
+
+        console.log(res1);
+
+        const allTickets = [...res1.data, ...res2.data];
+        setTickets(allTickets);
+      } catch (err) {
+        console.error("Erreur lors du chargement des tickets :", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTickets();
+  }, [selectedPriorityId]);
 
   const handleTicketPress = (ticketId) => {
-    navigation.navigate("ShowTicket", { ticketId: ticketId, tickets: tickets });
+    navigation.navigate("ShowTicket", { ticketId, tickets });
   };
 
   return (
@@ -56,26 +57,41 @@ const IndexTicketScreen = ({ navigation }) => {
         <Text style={styles.instructionText}>
           Retrouvez ici tous vos tickets qui sont actuellement en cours.
         </Text>
+
         <View style={styles.filterSection}>
-          <Text style={styles.filterLabel}>Filtrer par priorité:</Text>
+          <Text style={styles.filterLabel}>Filtrer par priorité :</Text>
           <View style={styles.pickerContainer}>
             <Picker
-              selectedValue={selectedPriority}
+              selectedValue={selectedPriorityId}
               style={styles.picker}
-              dropdownIconColor={"#333"}
-              onValueChange={(itemValue) => setSelectedPriority(itemValue)}
+              dropdownIconColor="#333"
+              onValueChange={(value) =>
+                setSelectedPriorityId(value === "All" ? null : value)
+              }
             >
               <Picker.Item label="Tout" value="All" />
-              <Picker.Item label="Faible" value="Low" />
-              <Picker.Item label="Moyenne" value="Medium" />
-              <Picker.Item label="Élevée" value="High" />
+              {priorities.map((priority) => (
+                <Picker.Item
+                  key={priority.id}
+                  label={priority.name}
+                  value={priority.id}
+                />
+              ))}
             </Picker>
           </View>
         </View>
 
-        {filterTickets().map((item) => (
-          <TicketCard key={item.id} ticket={item} onPress={handleTicketPress} />
-        ))}
+        {loading ? (
+          <ActivityIndicator size="large" color="#007bff" />
+        ) : (
+          tickets.map((item) => (
+            <TicketCard
+              key={item.id}
+              ticket={item}
+              onPress={handleTicketPress}
+            />
+          ))
+        )}
       </View>
     </PageLayout>
   );

@@ -19,13 +19,24 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert("Erreur", "Veuillez remplir tous les champs.");
       return;
     }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       Alert.alert("Erreur", "Adresse email invalide.");
       return;
     }
 
     try {
-      await login(email, password);
+      const result = await login(email, password);
+      const roles = result.data.user.roles;
+
+      if (roles.includes("Admin") || roles.includes("Support")) {
+        Alert.alert(
+          "Accès refusé",
+          "Cette application est réservée aux utilisateurs.\nLes administrateurs et le support doivent utiliser l'application de gestion."
+        );
+        return;
+      }
+
       navigation.reset({
         index: 0,
         routes: [{ name: "Dashboard" }],

@@ -5,63 +5,84 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import PageLayout from "../../components/PageLayout";
 import MessageList from "../../components/MessageList";
+import { show as fetchTicket } from "../../services/ticket";
+import { create as sendMessageToApi } from "../../services/message";
 
 const ShowTicketScreen = ({ route }) => {
-  const { ticketId, tickets, showBtnMessage = true } = route.params;
+  const { ticketId, showBtnMessage = true } = route.params;
 
   const [ticket, setTicket] = useState(null);
-  const [messages, setMessages] = useState([
-    {
-      id: "1",
-      user: "Utilisateur",
-      message: "J'ai un problème et j'ai besoin d'aide ...",
-    },
-    {
-      id: "2",
-      user: "Support",
-      message: "Bonjour, comment puis-je vous aider ?",
-    },
-  ]);
+  const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
-    const foundTicket = tickets.find((ticket) => ticket.id === ticketId);
-    setTicket(foundTicket);
-  }, [ticketId, tickets]);
+    const loadTicket = async () => {
+      try {
+        const res = await fetchTicket(ticketId);
+        setTicket(res.data);
+      } catch (err) {
+        console.error("Erreur lors du chargement du ticket :", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTicket();
+  }, [ticketId]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      const newMessageObj = {
-        id: (messages.length + 1).toString(),
-        user: "Utilisateur",
-        message: newMessage,
-      };
-      setMessages([...messages, newMessageObj]);
-      setNewMessage("");
+      try {
+        const res = await sendMessageToApi(ticket.id, newMessage);
+        const addedMessage = {
+          id: res.data.id,
+          user: res.data.user
+            ? res.data.user
+            : { first_name: "Vous", roles: ["User"] },
+          content: res.data.content,
+        };
+
+        setTicket((prev) => ({
+          ...prev,
+          messages: [...prev.messages, addedMessage],
+        }));
+
+        setNewMessage("");
+      } catch (err) {
+        console.error("Erreur lors de l'envoi du message :", err.message);
+      }
     }
   };
 
+  const formatMessages = (messages) =>
+    messages.map((msg) => ({
+      id: msg.id.toString(),
+      user: msg.user.roles.includes("Support")
+        ? "Support"
+        : `${msg.user.first_name} ${msg.user.last_name}`,
+      message: msg.content,
+    }));
+
   return (
     <PageLayout>
-      {ticket && (
+      {loading ? (
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : ticket ? (
         <>
           <View style={styles.ticketInfo}>
             <Text style={styles.ticketSubject}>{ticket.subject}</Text>
             <Text style={styles.ticketDetails}>
-              Priorité :{" "}
-              {ticket.priority === "High"
-                ? "Élevée"
-                : ticket.priority === "Medium"
-                ? "Moyenne"
-                : "Faible"}
+              Priorité : {ticket.priority.name}
             </Text>
-            <Text style={styles.ticketDetails}>Statut : {ticket.status}</Text>
+            <Text style={styles.ticketDetails}>
+              Statut : {ticket.status.name}
+            </Text>
           </View>
 
-          <MessageList messages={messages} />
+          <MessageList messages={formatMessages(ticket.messages)} />
 
           {showBtnMessage && (
             <View style={styles.sendMessageSection}>
@@ -81,6 +102,8 @@ const ShowTicketScreen = ({ route }) => {
             </View>
           )}
         </>
+      ) : (
+        <Text style={styles.errorText}>Ticket introuvable.</Text>
       )}
     </PageLayout>
   );
@@ -138,6 +161,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
+  },
+  errorText: {
+    textAlign: "center",
+    color: "red",
+    fontSize: 16,
+    marginTop: 20,
   },
 });
 

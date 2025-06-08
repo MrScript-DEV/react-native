@@ -13,25 +13,25 @@ const SettingsScreen = ({ navigation }) => {
         routes: [{ name: "Login" }],
       });
     } catch (err) {
-      Alert.alert("Erreur", err.message || "Déconnexion impossible.");
+      console.log(err);
     }
   };
 
   return (
     <PageLayout>
       <View style={styles.container}>
-        <View style={styles.headerSection}>
+        {/* <View style={styles.headerSection}>
           <Text style={styles.userName}>John Doe</Text>
-        </View>
+        </View> */}
 
-        <View style={styles.settingsGroup}>
+        {/* <View style={styles.settingsGroup}>
           <Text style={styles.groupTitle}>Compte</Text>
           <CustomButton
             iconSource={require("../../assets/icons/edit_profile_icon.png")}
             buttonText="Modifier le profil"
             onPress={() => navigation.navigate("EditProfile")}
           />
-        </View>
+        </View> */}
 
         <View style={styles.settingsGroup}>
           <Text style={styles.groupTitle}>Application</Text>

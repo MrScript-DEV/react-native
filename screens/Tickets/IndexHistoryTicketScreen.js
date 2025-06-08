@@ -1,49 +1,48 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PageLayout from "../../components/PageLayout";
 import TicketCard from "../../components/TicketCard";
+import { index as fetchTickets } from "../../services/ticket";
+import { index as fetchPriorities } from "../../services/priority";
 
 const IndexHistoryTicketScreen = ({ navigation }) => {
-  const closedTickets = [
-    {
-      id: "5",
-      subject: "Problème de connexion",
-      priority: "High",
-      status: "Fermé",
-      unreadMessages: 2,
-    },
-    {
-      id: "6",
-      subject: "Erreur lors du paiement",
-      priority: "Medium",
-      status: "Fermé",
-      unreadMessages: 0,
-    },
-    {
-      id: "7",
-      subject: "Bogue dans l'application",
-      priority: "Low",
-      status: "Fermé",
-      unreadMessages: 0,
-    },
-  ];
+  const [tickets, setTickets] = useState([]);
+  const [priorities, setPriorities] = useState([]);
+  const [selectedPriorityId, setSelectedPriorityId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [selectedPriority, setSelectedPriority] = useState("All");
+  useEffect(() => {
+    const loadPriorities = async () => {
+      try {
+        const res = await fetchPriorities();
+        setPriorities(res.data);
+      } catch (err) {
+        console.error("Erreur lors du chargement des priorités :", err.message);
+      }
+    };
+    loadPriorities();
+  }, []);
 
-  const filterTickets = () => {
-    if (selectedPriority === "All") {
-      return closedTickets;
-    }
-    return closedTickets.filter(
-      (ticket) => ticket.priority === selectedPriority
-    );
-  };
+  useEffect(() => {
+    const loadTickets = async () => {
+      setLoading(true);
+      try {
+        const res = await fetchTickets(3, selectedPriorityId);
+        setTickets(res.data);
+      } catch (err) {
+        console.error("Erreur lors du chargement des tickets :", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTickets();
+  }, [selectedPriorityId]);
 
   const handleTicketPress = (ticketId) => {
     navigation.navigate("ShowTicket", {
       ticketId: ticketId,
-      tickets: closedTickets,
+      tickets: tickets,
       showBtnMessage: false,
     });
   };
@@ -56,25 +55,39 @@ const IndexHistoryTicketScreen = ({ navigation }) => {
         </Text>
 
         <View style={styles.filterSection}>
-          <Text style={styles.filterLabel}>Filtrer par priorité:</Text>
+          <Text style={styles.filterLabel}>Filtrer par priorité :</Text>
           <View style={styles.pickerContainer}>
             <Picker
-              selectedValue={selectedPriority}
+              selectedValue={selectedPriorityId}
               style={styles.picker}
-              dropdownIconColor={"#333"}
-              onValueChange={(itemValue) => setSelectedPriority(itemValue)}
+              dropdownIconColor="#333"
+              onValueChange={(value) =>
+                setSelectedPriorityId(value === "All" ? null : value)
+              }
             >
               <Picker.Item label="Tout" value="All" />
-              <Picker.Item label="Faible" value="Low" />
-              <Picker.Item label="Moyenne" value="Medium" />
-              <Picker.Item label="Élevée" value="High" />
+              {priorities.map((priority) => (
+                <Picker.Item
+                  key={priority.id}
+                  label={priority.name}
+                  value={priority.id}
+                />
+              ))}
             </Picker>
           </View>
         </View>
 
-        {filterTickets().map((item) => (
-          <TicketCard key={item.id} ticket={item} onPress={handleTicketPress} />
-        ))}
+        {loading ? (
+          <ActivityIndicator size="large" color="#007bff" />
+        ) : (
+          tickets.map((item) => (
+            <TicketCard
+              key={item.id}
+              ticket={item}
+              onPress={handleTicketPress}
+            />
+          ))
+        )}
       </View>
     </PageLayout>
   );

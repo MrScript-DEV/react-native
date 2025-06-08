@@ -1,49 +1,69 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PageLayout from "../../components/PageLayout";
 import TicketCard from "../../components/TicketCard";
+import { index as fetchTickets } from "../../services/ticket";
+import { index as fetchPriorities } from "../../services/priority";
+import { updateRating } from "../../services/ticket";
 
 const IndexEvaluateTicketScreen = ({ navigation }) => {
-  const evaluateTickets = [
-    {
-      id: "8",
-      subject: "Assistance pour problème de connexion",
-      priority: "High",
-      status: "À évaluer",
-      unreadMessages: 1,
-    },
-    {
-      id: "9",
-      subject: "Suivi erreur de paiement",
-      priority: "Medium",
-      status: "À évaluer",
-      unreadMessages: 0,
-    },
-  ];
-
-  const [selectedPriority, setSelectedPriority] = useState("All");
+  const [tickets, setTickets] = useState([]);
+  const [priorities, setPriorities] = useState([]);
+  const [selectedPriorityId, setSelectedPriorityId] = useState("");
   const [ratings, setRatings] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const filterTickets = () => {
-    if (selectedPriority === "All") {
-      return evaluateTickets;
-    }
-    return evaluateTickets.filter(
-      (ticket) => ticket.priority === selectedPriority
-    );
-  };
+  useEffect(() => {
+    const loadPriorities = async () => {
+      try {
+        const res = await fetchPriorities();
+        setPriorities(res.data);
+      } catch (err) {
+        console.error("Erreur lors du chargement des priorités :", err.message);
+      }
+    };
+    loadPriorities();
+  }, []);
+
+  useEffect(() => {
+    const loadTickets = async () => {
+      setLoading(true);
+      try {
+        const res = await fetchTickets(3, selectedPriorityId || undefined);
+        const nonRatedTickets = res.data.filter((t) => t.rating === 0);
+        setTickets(nonRatedTickets);
+      } catch (err) {
+        console.error("Erreur lors du chargement des tickets :", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTickets();
+  }, [selectedPriorityId]);
 
   const handleTicketPress = (ticketId) => {
     navigation.navigate("ShowTicket", {
-      ticketId: ticketId,
-      tickets: evaluateTickets,
+      ticketId,
       showBtnMessage: false,
     });
   };
 
-  const handleRatingChange = (ticketId, rating) => {
-    setRatings({ ...ratings, [ticketId]: rating });
+  const handleRatingChange = async (ticketId, rating) => {
+    setRatings((prev) => ({ ...prev, [ticketId]: rating }));
+
+    try {
+      await updateRating(ticketId, rating);
+      console.log(`Rating mis à jour pour le ticket ${ticketId} : ${rating}`);
+    } catch (err) {
+      console.error(`Erreur lors de la mise à jour du rating :`, err.message);
+    }
   };
 
   return (
@@ -54,35 +74,45 @@ const IndexEvaluateTicketScreen = ({ navigation }) => {
         </Text>
 
         <View style={styles.filterSection}>
-          <Text style={styles.filterLabel}>Filtrer par priorité:</Text>
+          <Text style={styles.filterLabel}>Filtrer par priorité :</Text>
           <View style={styles.pickerContainer}>
             <Picker
-              selectedValue={selectedPriority}
+              selectedValue={selectedPriorityId}
               style={styles.picker}
-              dropdownIconColor={"#333"}
-              onValueChange={(itemValue) => setSelectedPriority(itemValue)}
+              dropdownIconColor="#333"
+              onValueChange={(value) => setSelectedPriorityId(value)}
             >
-              <Picker.Item label="Tout" value="All" />
-              <Picker.Item label="Faible" value="Low" />
-              <Picker.Item label="Moyenne" value="Medium" />
-              <Picker.Item label="Élevée" value="High" />
+              <Picker.Item label="Tout" value="" />
+              {priorities.map((priority) => (
+                <Picker.Item
+                  key={priority.id}
+                  label={priority.name}
+                  value={priority.id}
+                />
+              ))}
             </Picker>
           </View>
         </View>
 
-        <ScrollView style={styles.ticketsListContainer}>
-          {filterTickets().map((item) => (
-            <View key={item.id} style={styles.ticketItemContainer}>
-              <TicketCard
-                ticket={item}
-                onPress={handleTicketPress}
-                showRating={true}
-                rating={ratings[item.id] || 0}
-                onRatingChange={(rating) => handleRatingChange(item.id, rating)}
-              />
-            </View>
-          ))}
-        </ScrollView>
+        {loading ? (
+          <ActivityIndicator size="large" color="#007bff" />
+        ) : (
+          <ScrollView style={styles.ticketsListContainer}>
+            {tickets.map((item) => (
+              <View key={item.id} style={styles.ticketItemContainer}>
+                <TicketCard
+                  ticket={item}
+                  onPress={handleTicketPress}
+                  showRating={true}
+                  rating={ratings[item.id] || 0}
+                  onRatingChange={(rating) =>
+                    handleRatingChange(item.id, rating)
+                  }
+                />
+              </View>
+            ))}
+          </ScrollView>
+        )}
       </View>
     </PageLayout>
   );
